@@ -4,8 +4,8 @@ import (
 	. "github.com/ChaunceyShannon/golanglibs"
 )
 
-func Panic(status int) {
-	if status != 0 {
+func system(cmd string) {
+	if Os.System(cmd) != 0 {
 		Panicerr("Error while execute command")
 	}
 }
@@ -25,7 +25,7 @@ func main() {
 	Lg.Trace("Using temporary directory:", tmpGitDir)
 
 	Lg.Trace("Clone git repository")
-	Panic(Os.System("git clone -b " + git_branch + " " + git_repo.Schema + "://" + git_username + ":" + git_password + "@" + git_repo.Host + git_repo.Path + " ."))
+	system("git clone -b " + git_branch + " " + git_repo.Schema + "://" + git_username + ":" + git_password + "@" + git_repo.Host + git_repo.Path + " .")
 
 	Lg.Trace("Change directory to", git_app_path)
 	Os.Mkdir(Os.Path.Join(tmpGitDir, git_app_path))
@@ -35,14 +35,14 @@ func main() {
 	if !Os.Path.Exists("kustomization.yaml") {
 		Os.Touch("kustomization.yaml")
 	}
-	Panic(Os.System("kustomize edit set image " + docker_image))
+	system("kustomize edit set image " + docker_image)
 
 	Os.Chdir(tmpGitDir)
 
 	Lg.Trace("Push to git repository")
-	Panic(Os.System("git config --global user.email 'drone@" + git_repo.Host + "'"))
-	Panic(Os.System("git config --global user.name 'drone'"))
-	Panic(Os.System("git add *"))
-	Panic(Os.System("git commit -m 'Set image to " + docker_image))
-	Panic(Os.System("git push"))
+	system("git config --global user.email 'drone@" + git_repo.Host + "'")
+	system("git config --global user.name 'drone'")
+	system("git add *")
+	system("git commit -m 'Set image to " + docker_image)
+	system("git push")
 }
